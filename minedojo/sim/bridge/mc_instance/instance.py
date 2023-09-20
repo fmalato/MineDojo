@@ -165,7 +165,10 @@ class MinecraftInstance:
             )
 
             # 2. Create a watcher process to ensure things get cleaned up
+
             if not daemonize:
+                #import time
+                #time.sleep(20)
                 # 2. Create a watcher process to ensure things get cleaned up
                 self.watcher_process = watchdog.launch(
                     parent_pid, self.minecraft_process.pid, self.instance_dir
@@ -367,7 +370,8 @@ class MinecraftInstance:
         """
         launch_script = "launchClient.sh"
         if os.name == "nt":
-            raise ValueError("TODO")
+            #raise ValueError("TODO")
+            launch_script = "launchClient.bat"
 
         launch_script = os.path.join(minecraft_dir, launch_script)
         rundir = os.path.join(minecraft_dir, "run")

@@ -64,7 +64,7 @@ class BridgeEnv:
     def is_terminated(self):
         return self._terminated
 
-    def reset(self, episode_uid: str, agent_xmls: List[etree.Element]):
+    def reset(self, episode_uid: str, agent_xmls: List[etree.Element], seed=None):
         # seed the manager
         self._seed_instance_manager()
 
@@ -76,7 +76,7 @@ class BridgeEnv:
         # the pipe to these instances, and  update the agent xmls to get
         # the port/ip of the master agent send the remaining XMLS.
         self._send_mission(
-            self._instances[0], agent_xmls[0], self._get_token(0, episode_uid)
+            self._instances[0], agent_xmls[0], self._get_token(0, episode_uid), seed=seed
         )  # Master
         if self._agent_count > 1:
             raise ValueError("TODO")

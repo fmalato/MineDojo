@@ -32,7 +32,7 @@ class DeltaInventoryWrapper(gym.Wrapper):
             env.action_space, spaces.MultiDiscrete
         ), "please use this wrapper with `NNActionSpaceWrapper!`"
         assert (
-            len(env.action_space.nvec) == 8
+            len(env.action_space.nvec) == 8 or len(env.action_space.nvec) == 9
         ), "please use this wrapper with `NNActionSpaceWrapper!`"
         assert op_action_idx < len(env.action_space.nvec)
         assert craft_arg_idx < len(env.action_space.nvec)
@@ -83,6 +83,8 @@ class DeltaInventoryWrapper(gym.Wrapper):
 
     def step(self, action):
         observation, reward, done, info = self.env.step(action)
+        if len(action) == 2 and isinstance(action, tuple):
+            action = action[0]
         new_obs = self.observation(observation, action)
         self._prev_inventory = deepcopy(observation["inventory"])
         self._prev_mask = deepcopy(observation["masks"]["craft_smelt"])

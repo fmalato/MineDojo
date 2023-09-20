@@ -21,7 +21,7 @@ class NNActionSpaceWrapper(gym.Wrapper):
         discretized_camera_interval: Union[int, float] = 15,
         strict_check: bool = True,
     ):
-        assert (
+        """assert (
             "equip" in env.action_space.keys()
             and "place" in env.action_space.keys()
             and "swap_slot" not in env.action_space.keys()
@@ -29,13 +29,14 @@ class NNActionSpaceWrapper(gym.Wrapper):
         assert (
             "inventory" in env.observation_space.keys()
         ), f"missing inventory from obs space"
+        """
         super().__init__(env=env)
 
         n_pitch_bins = math.ceil(360 / discretized_camera_interval) + 1
         n_yaw_bins = math.ceil(360 / discretized_camera_interval) + 1
 
-        self.action_space = spaces.MultiDiscrete(
-            [
+        
+        """[
                 3,  # forward and back, 0: noop, 1: forward, 2: back
                 3,  # 0: noop, 1: left, 2: right
                 4,  # 0: noop, 1: jump, 2: sneak, 3: sprint
@@ -54,13 +55,38 @@ class NNActionSpaceWrapper(gym.Wrapper):
                 0,
                 0,
                 0,
+            ],"""
+
+
+        self.action_space = spaces.MultiDiscrete(
+            [
+                3,  # forward and back, 0: noop, 1: forward, 2: back
+                3,  # 0: noop, 1: left, 2: right
+                4,  # 0: noop, 1: jump, 2: sneak, 3: sprint
+                n_pitch_bins,  # camera pitch, 0: -180, n_pitch_bins - 1: +180
+                n_yaw_bins,  # camera yaw, 0: -180, n_yaw_bins - 1: +180,
+                5,  # functional actions, 0: no_op, 1: use, 2: drop, 3: attack 4: craft 5: equip 6: place 7: destroy
+                len(MC.ALL_CRAFT_SMELT_ITEMS),  # arg for "craft"
+                MC.N_INV_SLOTS,  # arg for "equip", "place", and "destroy"
+                10  # Hotbars
+            ],
+            noop_vec=[
+                0,
+                0,
+                0,
+                (n_pitch_bins - 1) // 2,
+                (n_yaw_bins - 1) // 2,
+                0,
+                0,
+                0,
+                0
             ],
         )
         self._cam_interval = discretized_camera_interval
         self._inventory_names = None
         self._strict_check = strict_check
 
-    def action(self, action: Sequence[int]):
+    def action(self, action: Sequence[int], camera_angles=None):
         """
         NN action to Malmo action
         """
@@ -86,10 +112,17 @@ class NNActionSpaceWrapper(gym.Wrapper):
             noop["sneak"] = 1
         elif action[2] == 3:
             noop["sprint"] = 1
-        # parse camera pitch
-        noop["camera"][0] = float(action[3]) * self._cam_interval + (-180)
-        # parse camera yaw
-        noop["camera"][1] = float(action[4]) * self._cam_interval + (-180)
+        if camera_angles is None:
+            # parse camera pitch
+            noop["camera"][0] = float(action[3]) * self._cam_interval + (-180)
+            # parse camera yaw
+            noop["camera"][1] = float(action[4]) * self._cam_interval + (-180)
+        else:
+            noop["camera"][0] = float(camera_angles[0])
+            noop["camera"][1] = float(camera_angles[1])
+        if action[8] > 0:
+            hotbar_keys = ["hotbar.1", "hotbar.2", "hotbar.3", "hotbar.4", "hotbar.5", "hotbar.6", "hotbar.7", "hotbar.8", "hotbar.9"]
+            noop[hotbar_keys[action[8]-1]] = 1
 
         # ------ parse functional actions ------
         fn_action = action[5]
@@ -261,7 +294,11 @@ class NNActionSpaceWrapper(gym.Wrapper):
         return obs
 
     def step(self, action: Sequence[int]):
-        malmo_action, destroy_item = self.action(action)
+        if len(action) == 2 and isinstance(action, tuple):
+            malmo_action, destroy_item = self.action(action[0], action[1])
+            action = action[0]
+        else:
+            malmo_action, destroy_item = self.action(action)
         destroy_item, destroy_slot = destroy_item
         if destroy_item:
             obs, reward, done, info = self.env.set_inventory(

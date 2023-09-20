@@ -104,6 +104,7 @@ class CreativeMeta(MetaTaskBase):
         # ------ misc ------
         break_speed_multiplier: float = 1.0,
         sim_name: str = "CreativeMeta",
+        **kwargs
     ):
         super().__init__(
             fast_reset=fast_reset,
@@ -124,6 +125,7 @@ class CreativeMeta(MetaTaskBase):
             initial_weather=initial_weather,
             start_health=start_health,
             start_food=start_food,
+            **kwargs
         )
 
     def _compute_reward_hook(

@@ -61,6 +61,9 @@ class FastResetWrapper(gym.Wrapper):
             )
         if clear_ground:
             self._reset_cmds.append("/kill @e[type=item]")
+            self._reset_cmds.append(
+                f"/spreadplayers ~ ~ 0 {random_teleport_range} false @p"
+            )
 
         self._server_start = False
         self._info_prev_reset = None
