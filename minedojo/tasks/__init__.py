@@ -77,6 +77,7 @@ def _meta_task_make(meta_task: str, *args, **kwargs) -> MetaTaskBase | FastReset
                 return FastResetWrapper(
                     MineDojoSim(*args, **kwargs), fast_reset_random_teleport_range
                 )
+    # TODO: check biomes in _ALL_VARS_
     return MetaTaskName2Class[meta_task](*args, **kwargs)
 
 
@@ -102,7 +103,7 @@ _ALL_VARS = {
         "witch",
         "enderman",
     ],
-    "end_mob": ["shulker", "endermite", "enderman",],
+    "end_mob": ["shulker", "endermite"],
     "nether_mob": [
         "blaze",
         "ghast",
@@ -115,8 +116,8 @@ _ALL_VARS = {
     # Harvest
     "quantity": [1, 8],
     ## wool and milk
-    "cow_biomes": ["plains", "extreme_hills", "forest"],
-    "sheep_biomes": ["plains", "extreme_hills", "forest"],
+    "cow_biomes": ["plains"],
+    "sheep_biomes": ["plains"],
     ## mine
     "ore_type": ["iron_ore", "gold_ore", "diamond", "redstone", "coal", "cobblestone"],
     "pickaxe_material": ["wooden", "stone", "iron", "golden", "diamond"],
@@ -477,7 +478,7 @@ def _parse_inventory_dict(inv_dict: dict[str, dict]) -> list[InventoryItem]:
 
 def _specific_task_make(task_id: str, *args, **kwargs):
     assert task_id in ALL_TASKS_SPECS, f"Invalid task id provided {task_id}"
-    task_specs = ALL_TASKS_SPECS[task_id].copy()
+    task_specs = ALL_TASKS_SPECS[task_id]
 
     # handle list of inventory items
     if "initial_inventory" in task_specs:

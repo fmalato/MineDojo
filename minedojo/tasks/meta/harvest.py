@@ -155,6 +155,7 @@ class HarvestMeta(ExtraSpawnMetaTaskBase):
         event_level_control: bool = True,
         # ------ misc ------
         sim_name: str = "HarvestMeta",
+        **kwargs
     ):
         if isinstance(target_names, str):
             target_names = [target_names]
@@ -236,6 +237,7 @@ class HarvestMeta(ExtraSpawnMetaTaskBase):
             start_food=start_food,
             generate_world_type=generate_world_type,
             specified_biome=specified_biome,
+            **kwargs
         )
 
     @property

@@ -16,8 +16,7 @@
     "MixinMergeStatsFix",
     "MixinForgeHookStatsFix",
     "MixinItemFood",
-    "MixinItemBucketMilk",
-    "MixinVec3d"
+    "MixinItemBucketMilk"
   ],
   "server": [],
   "client": [

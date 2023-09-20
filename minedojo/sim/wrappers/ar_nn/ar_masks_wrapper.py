@@ -23,12 +23,12 @@ class ARMasksWrapper(gym.ObservationWrapper):
             env.action_space, spaces.MultiDiscrete
         ), "please use this wrapper with `NNActionSpaceWrapper!`"
         assert (
-            len(env.action_space.nvec) == 8
+            len(env.action_space.nvec) == 8 or len(env.action_space.nvec) == 9
         ), "please use this wrapper with `NNActionSpaceWrapper!`"
         super().__init__(env=env)
 
         action_categories_and_num_args = action_categories_and_num_args or dict(
-            no_op=0, use=0, drop=0, attack=0, craft=1, equip=1, place=1, destroy=1
+            no_op=0, use=0, drop=0, attack=0, craft=1, equip=1, place=1, destroy=1, hotbar=0
         )
         obs_space = env.observation_space
         n_fn_actions = len(action_categories_and_num_args)

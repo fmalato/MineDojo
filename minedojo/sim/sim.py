@@ -385,6 +385,7 @@ class MineDojoSim(gym.Env):
         self._prev_action = None
         self._prev_info = None
 
+        self._rng_seed = None
         self._cmd_executor = CMDExecutor(self, raise_error_on_invalid_cmds)
 
     @property
@@ -406,6 +407,7 @@ class MineDojoSim(gym.Env):
             seed: The seed for the number generator
         """
         self._rng = np.random.default_rng(seed)
+        self._rng_seed = seed
 
     def reset(self):
         """Resets the environment to an initial state and returns an initial observation.
@@ -416,7 +418,7 @@ class MineDojoSim(gym.Env):
         episode_id = str(uuid.uuid4())
 
         xml = etree.fromstring(self._sim_spec.to_xml(episode_id))
-        raw_obs = self._bridge_env.reset(episode_id, [xml])[0]
+        raw_obs = self._bridge_env.reset(episode_id, [xml], seed=self._rng_seed)[0]
         obs, info = self._process_raw_obs(raw_obs)
         self._prev_obs, self._prev_info = deepcopy(obs), deepcopy(info)
         return obs
